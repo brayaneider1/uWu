@@ -39,6 +39,7 @@ const ReferralBox = ({ referralCode, shareReferralCode, navigation }) => (
     px={4}
     py={5}
     borderRadius={10}
+    shadow={2}
     space={2}
     alignItems='center'
   >
@@ -55,7 +56,7 @@ const ReferralBox = ({ referralCode, shareReferralCode, navigation }) => (
 );
 
 const AnimatedWelcome = () => (
-  <Box mt={6} bg='#293751' rounded='lg' mx={5} p={4}>
+  <Box mt={6} bg='#293751' rounded='lg' mx={5} p={4} shadow={2}>
     <Flex flexDirection='row' justifyContent='center' align='center'>
       <LottieView
         style={styles.welcome}
@@ -73,7 +74,7 @@ const AnimatedWelcome = () => (
 );
 
 const TasksList = ({ navigation }) => (
-  <Box bg='#293751' rounded='lg' mx={5} p={2}>
+  <Box bg='#293751' rounded='lg' mx={5} p={2} shadow={3}>
     <Flex direction='column' justifyContent='space-between'>
       <HStack
         width='80%'
@@ -95,13 +96,10 @@ const TasksList = ({ navigation }) => (
         size='md'
         height={10}
         bg='white'
-        color='blue.600'
         borderColor='blue.600'
+        _text={{ color: 'blue.600', fontWeight: 'bold' }}
       >
-        <Text color='blue.600'>
-
-          Ver Tareas
-        </Text>
+        Ver Tareas
       </Button>
     </Flex>
   </Box>
@@ -128,7 +126,7 @@ const Home = ({ navigation }) => {
     try {
       const data = await getSubscriptionByUser(user?.sub);
       setSubscriptionData(data);
-      setCode(subscriptionData.user.referral_code)
+      setCode(subscriptionData.user.referral_code);
     } catch (error) {
       setError(error);
     } finally {

@@ -17,9 +17,7 @@ import Profits from './views/Main/profits';
 import Whitdrawals from './views/Main/withdrawals';
 import Reload from './views/Main/reloads';
 import TasksPlan from './views/Main/tasksPlan/tasksPlan';
-import { PressableScale } from './components/PressableScale/PressableScale';
 import Community from './views/Main/community/community';
-import { Reanimated } from 'react-native-reanimated';
 import { Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 
@@ -27,16 +25,11 @@ const MainStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Define un componente de carga
+// Pantalla de carga
 const LoadingScreen = () => {
   return (
     <Center flex={1} bg="#011D37">
-      <LottieView
-        source={require('./assets/lotties/coin.json')} // Asegúrate de tener un archivo Lottie aquí
-        autoPlay
-        loop
-        style={{ width: 150, height: 150 }}
-      />
+      {/* Lottie animation or any loading component */}
     </Center>
   );
 };
@@ -52,10 +45,11 @@ const tabBarStyle = {
   borderRadius: 20,
   backgroundColor: '#012240',
   shadowColor: '#000',
-  height: 60, // Aumenta la altura del tabbar
+  height: 60,
   paddingBottom: 10,
   shadowRadius: 10,
 };
+
 const getTabBarIcon = (route, focused, size) => {
   let iconName;
   const color = 'white';
@@ -129,61 +123,47 @@ const getTabBarIcon = (route, focused, size) => {
     </View>
   );
 };
+
+// Navegación principal
 export const Main = () => (
   <MainStack.Navigator
     screenOptions={{
       headerShown: false,
-      cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
-      transitionSpec: {
-        open: {
-          animation: 'timing',
-          config: {
-            duration: 300, // Duración de la animación de transición
-          },
-        },
-        close: {
-          animation: 'timing',
-          config: {
-            duration: 300, // Duración de la animación de transición
-          },
-        },
-      },
-      cardStyle: { backgroundColor: '#011D37' }, // Estilo de la tarjeta para mantener el fondo consistente
+      gestureEnabled: true,
+      gestureDirection: 'vertical', // Estilo vertical para los modales
+      cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS, // Transición de desplazamiento vertical
+      cardStyle: { backgroundColor: '#011D37' },
     }}
   >
     <MainStack.Screen name="Main" options={{ headerShown: false }}>
       {() => (
         <Tab.Navigator
           screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, size }) =>
-              getTabBarIcon(route, focused, size),
+            tabBarIcon: ({ focused, size }) => getTabBarIcon(route, focused, size),
             tabBarStyle: {
               ...tabBarStyle,
-              borderTopWidth: 0
-              // Aquí se usa el efecto "glass"
+              borderTopWidth: 0,
             },
             tabBarBackground: () => (
               <BlurView
                 tint="dark"
-                intensity={50} // Ajusta la intensidad del efecto de desenfoque
+                intensity={50}
                 style={{ border: '1px solid transparent' }}
               />
             ),
-
           })}
           tabBarOptions={{
             activeTintColor: 'white',
             inactiveTintColor: 'gray',
             style: { backgroundColor: 'transparent' },
           }}
-
         >
           <Tab.Screen
             name="Suscripciones"
             options={{
               headerShown: false,
-              lazy: true, // Retrasa la carga de la pestaña hasta que se haga clic en ella
-              lazyPlaceholder: () => <LoadingScreen />, // Pantalla de carga mientras la vista se prepara
+              lazy: true,
+              lazyPlaceholder: () => <LoadingScreen />,
             }}
             component={Tasks}
           />
@@ -208,19 +188,84 @@ export const Main = () => (
         </Tab.Navigator>
       )}
     </MainStack.Screen>
-    <MainStack.Screen name="Summary" component={ProfileSummary} />
-    <MainStack.Screen name="Community" component={Community} />
-    <MainStack.Screen name="TasksPlan" component={TasksPlan} />
-    <MainStack.Screen name="Help" component={Help} />
-    <MainStack.Screen name="Profits" component={Profits} />
-    <MainStack.Screen name="Reload" component={Reload} />
-    <MainStack.Screen name="Whitdrawals" component={Whitdrawals} />
-    <MainStack.Screen name="NotificationPlan" component={NotificationPlan} />
+
+    <MainStack.Screen name="Summary" component={ProfileSummary}     options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
+      }} />
+    <MainStack.Screen name="TasksPlan" component={TasksPlan}     options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
+      }} />
+    <MainStack.Screen
+      name="Community"
+      component={Community}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
+      }}
+    />
+    <MainStack.Screen
+      name="Help"
+      component={Help}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 },
+      }}
+    />
+    <MainStack.Screen
+      name="Profits"
+      component={Profits}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 },
+      }}
+    />
+    <MainStack.Screen
+      name="Reload"
+      component={Reload}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 },
+      }}
+    />
+    <MainStack.Screen
+      name="Whitdrawals"
+      component={Whitdrawals}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 },
+      }}
+    />
+    <MainStack.Screen
+      name="NotificationPlan"
+      component={NotificationPlan}
+      options={{
+        gestureEnabled: true,
+        presentation: 'modal',
+        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+      }}
+    />
+
   </MainStack.Navigator>
 );
 
+// Navegación para autenticación
 export const Auth = () => (
-  <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+  <AuthStack.Navigator
+    screenOptions={{
+      headerShown: false,
+      gestureEnabled: true, // Habilita gestos
+      cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS, // Transiciones con gestos verticales
+    }}
+  >
     <AuthStack.Screen name="Login" component={Login} />
     <AuthStack.Screen name="Register" component={Register} />
     <AuthStack.Screen name="NotificationPlan" component={NotificationPlan} />

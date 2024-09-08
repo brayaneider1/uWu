@@ -12,7 +12,15 @@ const Tasks = () => {
   const [error, setError] = useState(false);
   const { user } = useAuthStore();
   const [taskAssignments, setTaskAssignments] = useState([]);
-  const [reload, setReload] = useState(true)
+  const [reload, setReload] = useState(true);
+
+  const updateLocalStorage = (approvedTasks) => {
+    const storedTasks = approvedTasks.map(task => ({
+      id: task.id,
+      ganancia: task.ganancia,
+    }));
+    localStorage.setItem('approvedTasks', JSON.stringify(storedTasks));
+  };
 
   useEffect(() => {
     const fetchTaskAssignments = async () => {
@@ -20,11 +28,15 @@ const Tasks = () => {
       try {
         const data = await getTaskAssigmentsByUser(user?.sub);
         setTaskAssignments(data);
+
+        const approvedTasks = data.filter(task => task.state === 'REVIEW_APPROVED');
+        updateLocalStorage(approvedTasks);
+
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
-        setReload(false)
+        setReload(false);
       }
     };
 
@@ -55,9 +67,6 @@ const Tasks = () => {
     rejected: () => <TabCard handleSubmit={handleSubmit} tasks={categorizeTasks().rejected} />,
   });
 
-
-
-
   const handleSubmit = async (taskId) => {
     setLoading(true);
     setError(null);
@@ -81,7 +90,6 @@ const Tasks = () => {
         onIndexChange={setIndex}
         initialLayout={{ width: '100%' }}
         renderTabBar={renderTabBar}
-
       />
     </VStack>
   );

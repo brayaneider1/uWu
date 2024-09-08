@@ -53,11 +53,8 @@ const TasksPlan = () => {
     const navigation = useNavigation();
     const { user } = useAuthStore();
     const [subscriptionData, setSubscriptionData] = useState({});
-    console.log("🚀 ~ TasksPlan ~ subscriptionData:", subscriptionData)
     const [taskAssignments, setTaskAssignments] = useState([]);
-    console.log("🚀 ~ TasksPlan ~ taskAssignments:", taskAssignments)
     const [tasks, setTasks] = useState([]);
-    console.log("🚀 ~ TasksPlan ~ tasks:", tasks)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [reload, setReload] = useState(false);
