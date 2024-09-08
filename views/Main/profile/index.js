@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Box, Text, Icon, VStack, HStack, Flex, Input, ScrollView, Center, Button } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Share, Touchable, TouchableOpacity } from 'react-native';
+import { Share, TouchableOpacity } from 'react-native';
 import useAuthStore from '../../../store/useAuthStore';
+import { getTotalEarnings } from '../../../services/utils/getTotalEarnings';
+
 const menuItems = [
 	{ icon: 'money', text: 'Ganancias', stack: "Profits" },
 	{ icon: 'help', text: 'Ayuda', stack: "Help" },
@@ -17,9 +19,7 @@ const actions = [
 const TasksItem = [
 	{ title: 'Tareas completadas', quantity: 5 },
 	{ title: 'Tareas restante', quantity: 5 },
-
 ];
-
 
 const ReferralBox = ({ referralCode, shareReferralCode, navigation }) => (
 	<HStack
@@ -58,7 +58,6 @@ function MenuItem({ icon, text, navigation, stack }) {
 function ActionItem({ icon, text, navigation, stack }) {
 	return (
 		<TouchableOpacity onPress={() => navigation.navigate(stack)} >
-
 			<VStack alignItems="center"  >
 				<MaterialIcons name={icon} size={24} color="white" />
 				<Text color="white">{text}</Text>
@@ -77,9 +76,20 @@ function TasksItems({ title, quantity }) {
 }
 
 function Profile({ navigation }) {
-
 	const { code } = useAuthStore();
+	const [totalEarnings, setTotalEarnings] = useState('0'); // State to store total earnings
 
+	
+	useEffect(() => {
+		const fetchEarnings = async () => {
+			const earnings = await getTotalEarnings();
+
+			setTotalEarnings(earnings); 
+		};
+		
+		fetchEarnings();
+	}, []);
+	
 	const shareReferralCode = async () => {
 		const message = `¡Únete a nuestra comunidad! \nDescarga la aplicación de UwU en www.uwu.community y usa mi código de invitación para registrarte: ${code}`;
 		try {
@@ -88,16 +98,13 @@ function Profile({ navigation }) {
 			console.error('Error sharing:', error);
 		}
 	};
-
-
-
 	return (
 		<ScrollView bg="primaryBg" contentContainerStyle={{ flexGrow: 1 }}>
 			<Box flex={1} bg="primaryBg">
 				<Center flex={1}>
 					<VStack alignItems="center" py={5}>
 						<Text fontSize="md" color="white">Available Balance</Text>
-						<Text fontSize="2xl" bold color="yellow.400">$450 COIN</Text>
+						<Text fontSize="2xl" bold color="yellow.400">${totalEarnings} COIN</Text>
 					</VStack>
 				</Center>
 			</Box>
@@ -108,8 +115,6 @@ function Profile({ navigation }) {
 					))}
 				</HStack>
 				<ReferralBox navigation={navigation} referralCode={code} shareReferralCode={shareReferralCode} />
-
-
 
 				<Flex direction="column">
 					<Flex direction="row" justify="space-between">

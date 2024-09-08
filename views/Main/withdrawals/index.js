@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { VStack, Text, Icon, Flex, HStack, ScrollView, Divider, Button, Modal, Box, Input, FormControl } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getTotalEarnings } from '../../../services/utils/getTotalEarnings';
 
 function Whitdrawals() {
     const navigation = useNavigation();
@@ -10,7 +11,8 @@ function Whitdrawals() {
     const [editingAccount, setEditingAccount] = useState(false); // Estado para editar la cuenta
     const [inputValue, setInputValue] = useState(''); // Valor del input para la cuenta de Binance
     const [withdrawAmount, setWithdrawAmount] = useState(''); // Monto de retiro
-    const [totalAvailable, setTotalAvailable] = useState(1000000); // Simulación de saldo disponible del usuario
+    const [totalEarnings, setTotalEarnings] = useState('0'); // State to store total earnings
+    const [totalAvailable, setTotalAvailable] = useState(totalEarnings); // Simulación de saldo disponible del usuario
     const [isWithdrawEnabled, setIsWithdrawEnabled] = useState(false); // Estado para habilitar/deshabilitar botón
     const [withdrawRequests, setWithdrawRequests] = useState([]); // Lista de solicitudes de retiro
 
@@ -44,6 +46,20 @@ function Whitdrawals() {
         setShowModal(false);
         setWithdrawAmount(''); // Limpiar el monto después de la solicitud
     };
+
+
+	
+	useEffect(() => {
+		const fetchEarnings = async () => {
+			const earnings = await getTotalEarnings();
+
+			setTotalEarnings(earnings); 
+		};
+		
+		fetchEarnings();
+
+        setTotalAvailable(+totalEarnings)
+	}, [totalEarnings]);
 
     return (
         <VStack h="100%" bg="#1A202C" p={4} rounded="lg" space={4} alignItems="center">
@@ -144,7 +160,7 @@ function Whitdrawals() {
                                 _focus={{ borderColor: "purple.500", borderWidth: 1 }}
                             />
                             <Text color="gray.400" fontSize="sm" mt={2}>
-                                Saldo disponible: {totalAvailable}
+                                Saldo disponible: ${totalAvailable} COIN
                             </Text>
                         </FormControl>
 
