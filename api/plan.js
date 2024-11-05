@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'https://uwu-eight.vercel.app/v1';
+const apiUrl = 'https://backend-uwu.vercel.app/v1';
 
 export const getPlans = async () => {
   try {
@@ -28,7 +28,7 @@ export const getPlanByUser = async (userId) => {
 
 export const getTasksByPlan = async (planId) => {
   try {
-    const response = await axios.get(`${apiUrl}/tasks/${planId}/tasks`);
+    const response = await axios.get(`${apiUrl}/plan/${planId}/tasks`);
 
     return response.data;
   } catch (error) {

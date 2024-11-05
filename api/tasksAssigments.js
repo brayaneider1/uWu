@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'https://uwu-eight.vercel.app/v1';
+const apiUrl = 'https://backend-uwu.vercel.app/v1';
 
 export const getTaskAssigmentsByUser = async (userId) => {
   try {
@@ -14,6 +14,7 @@ export const getTaskAssigmentsByUser = async (userId) => {
 
 
 export const getSubscriptorsByCode = async (code) => {
+  console.log("🚀 ~ getSubscriptorsByCode ~ code:", code)
   try {
     const response = await axios.get(`${apiUrl}/subscriptions/referrer/${code}`);
     return response.data;
@@ -40,8 +41,9 @@ export const createTaskAssignment = async ({ taskId, userId, dueDate, attachment
 
 
 export const updateTaskAssigmentState = async (assignmentId, newState) => {
+  console.log("🚀 ~ updateTaskAssigmentState ~ newState:", newState)
   try {
-    const response = await axios.put(`${apiUrl}/task-assignments/${assignmentId}/state`, { newState });
+    const response = await axios.put(`${apiUrl}/task-assignments/${assignmentId}/state`, { newState:newState+"" });
     return response.data;
   } catch (error) {
     console.error('Error in update assigment:', error);

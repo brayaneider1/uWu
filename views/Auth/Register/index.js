@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
-import { Text, View, Button, Input, Alert, Spinner } from 'native-base';
+import { Text, View, Button, Input, Alert, Icon } from 'native-base';
 import { useForm, Controller } from 'react-hook-form';
+import { MaterialIcons } from '@expo/vector-icons';
 import useAuthStore from '../../../store/useAuthStore'; // Asegúrate de importar tu hook de Zustand aquí
 import LoadingOverlay from '../../../components/LoadingOverlay/LoadingOverlay';
 
@@ -12,6 +13,7 @@ export default function Register({ navigation }) {
     formState: { errors },
   } = useForm();
   const [hidePassword, setHidePassword] = useState(true);
+  const [hidePassword2, setHidePassword2] = useState(true);
   const [error, setError] = useState({ show: false, message: '' });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,17 +24,16 @@ export default function Register({ navigation }) {
     setError({ show: false, message: '' });
     if (data.password !== data.password2) {
       setError({ show: true, message: 'Las contraseñas no coinciden' });
+      setIsLoading(false);
       return;
     }
 
     try {
       await register(data.name, data.email, data.phoneNumber, data.password, data.code);
       setIsLoading(false);
-
-      navigation.navigate('Login'); // Cambia a la pantalla deseada después del registro
+      navigation.navigate('Login');
     } catch (err) {
       setIsLoading(false);
-
       setError({
         show: true,
         message: 'Error al registrarse. Por favor, inténtalo de nuevo',
@@ -75,13 +76,23 @@ export default function Register({ navigation }) {
       keyboardType: 'default',
       secureTextEntry: hidePassword,
       rules: { required: true },
+      icon: (
+        <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+          <Icon as={MaterialIcons} name={hidePassword ? 'visibility-off' : 'visibility'} mx={2} size={5} color="white" />
+        </TouchableOpacity>
+      ),
     },
     {
       name: 'password2',
       placeholder: 'Confirmación de Contraseña',
       keyboardType: 'default',
-      secureTextEntry: hidePassword,
+      secureTextEntry: hidePassword2,
       rules: { required: true },
+      icon: (
+        <TouchableOpacity onPress={() => setHidePassword2(!hidePassword2)}>
+          <Icon as={MaterialIcons} name={hidePassword2 ? 'visibility-off' : 'visibility'} mx={2} size={5} color="white" />
+        </TouchableOpacity>
+      ),
     },
   ];
 
@@ -97,7 +108,8 @@ export default function Register({ navigation }) {
         <Alert status='error' w='100%'>
           <Text>{error.message}</Text>
         </Alert>
-      )}{isLoading && <LoadingOverlay />}
+      )}
+      {isLoading && <LoadingOverlay />}
 
       <View style={{ alignItems: 'center' }}>
         <Text color='white' fontSize='30' fontWeight='bold'>
@@ -116,6 +128,7 @@ export default function Register({ navigation }) {
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
                 my={2}
+                px={2}
                 color='white'
                 borderRadius='lg'
                 onBlur={onBlur}
@@ -124,6 +137,7 @@ export default function Register({ navigation }) {
                 placeholder={field.placeholder}
                 keyboardType={field.keyboardType}
                 secureTextEntry={field.secureTextEntry}
+                InputRightElement={field.icon}
               />
             )}
             name={field.name}
@@ -150,4 +164,3 @@ export default function Register({ navigation }) {
     </View>
   );
 }
-

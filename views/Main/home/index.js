@@ -13,7 +13,6 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Share } from 'react-native';
 import useAuthStore from '../../../store/useAuthStore';
-import { getSubscriptionByUser } from '../../../api/subscriptions';
 import LoadingOverlay from '../../../components/LoadingOverlay/LoadingOverlay';
 import LottieView from 'lottie-react-native';
 
@@ -106,10 +105,8 @@ const TasksList = ({ navigation }) => (
 );
 
 const Home = ({ navigation }) => {
-  const { user, setCode } = useAuthStore();
-  const [subscriptionData, setSubscriptionData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { user, subscriptionData, loading, error, fetchSubscription } = useAuthStore();
+  console.log("🚀 ~ Home ~ subscriptionData:", subscriptionData)
 
   const shareReferralCode = async () => {
     const message = `¡Únete a nuestra comunidad! \nDescarga la aplicación de UwU en www.uwu.community y usa mi código de invitación para registrarte: ${subscriptionData?.user?.referral_code}`;
@@ -119,23 +116,12 @@ const Home = ({ navigation }) => {
       console.error('Error sharing:', error);
     }
   };
-
-  const fetchSubscription = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getSubscriptionByUser(user?.sub);
-      setSubscriptionData(data);
-      setCode(subscriptionData.user.referral_code);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
-    fetchSubscription();
+    if (user) {
+      fetchSubscription(user.sub);
+    }
   }, []);
 
   return (

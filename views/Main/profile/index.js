@@ -76,14 +76,15 @@ function TasksItems({ title, quantity }) {
 }
 
 function Profile({ navigation }) {
-	const { code } = useAuthStore();
+	const { subscriptionData,user } = useAuthStore();
+	const code = subscriptionData?.user?.referral_code;
+	console.log("🚀 ~ Profile ~ code:", code,user)
 	const [totalEarnings, setTotalEarnings] = useState('0'); // State to store total earnings
 
 	
 	useEffect(() => {
 		const fetchEarnings = async () => {
 			const earnings = await getTotalEarnings();
-
 			setTotalEarnings(earnings); 
 		};
 		

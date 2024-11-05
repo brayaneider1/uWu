@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { MaterialIcons } from "@expo/vector-icons";
@@ -189,16 +190,16 @@ export const Main = () => (
       )}
     </MainStack.Screen>
 
-    <MainStack.Screen name="Summary" component={ProfileSummary}     options={{
-        gestureEnabled: true,
-        presentation: 'modal',
-        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
-      }} />
-    <MainStack.Screen name="TasksPlan" component={TasksPlan}     options={{
-        gestureEnabled: true,
-        presentation: 'modal',
-        cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
-      }} />
+    <MainStack.Screen name="Summary" component={ProfileSummary} options={{
+      gestureEnabled: true,
+      presentation: 'modal',
+      cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
+    }} />
+    <MainStack.Screen name="TasksPlan" component={TasksPlan} options={{
+      gestureEnabled: true,
+      presentation: 'modal',
+      cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 10 }, // Adds opacity
+    }} />
     <MainStack.Screen
       name="Community"
       component={Community}
@@ -253,7 +254,6 @@ export const Main = () => (
         cardStyle: { marginTop: 30, backgroundColor: 'rgba(0, 0, 0, 0.5)' },
       }}
     />
-
   </MainStack.Navigator>
 );
 
@@ -271,3 +271,12 @@ export const Auth = () => (
     <AuthStack.Screen name="NotificationPlan" component={NotificationPlan} />
   </AuthStack.Navigator>
 );
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Main />
+      <Auth />
+    </NavigationContainer>
+  );
+}

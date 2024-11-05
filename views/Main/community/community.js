@@ -8,7 +8,8 @@ import { getSubscriptorsByCode } from '../../../api/subscriptions';
 
 function Community() {
   const navigation = useNavigation();
-  const { user, code } = useAuthStore();
+  const { user,subscriptionData  } = useAuthStore();
+	const code = subscriptionData?.user?.referral_code;
   const [subscriptorsData, setSubscriptorsData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -17,7 +18,13 @@ function Community() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getSubscriptorsByCode(code == 'fKRiyFkr' ? 'XYZ123' : code);
+      console.log('====================================');
+      console.log(code);
+      console.log('====================================');
+      console.log('====================================');
+      console.log(user);
+      console.log('====================================');
+      const data = await getSubscriptorsByCode(code == 'rLnTCgMM' ? 'ABC123' : code);
       setSubscriptorsData(data);
     } catch (error) {
       setError(error);
@@ -56,9 +63,9 @@ function Community() {
 
         {/* Caja de descripción */}
         <VStack bg="#2D3748" p={4} borderRadius={10} alignItems="center" mb={5} shadow="4" _light={{ bg: '#2A4365' }}>
-          <Text fontWeight={400} color="gray.300" textAlign="center">
-            ¡Bienvenido a la <Text fontWeight={700} color="purple.400">comunidad!</Text> Aquí puedes ver todos los suscriptores conectados a tu plan.
-          </Text>
+        <Text fontWeight={400} color="gray.300" textAlign="center">
+  ¡Bienvenido a la <Text fontWeight={700} color="purple.400">comunidad!</Text> Aquí puedes ver y conectar con todos los suscriptores que forman parte de tu red.
+</Text>
         </VStack>
 
         {/* Subscritores */}

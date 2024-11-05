@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { VStack, Text, Icon, Flex, ScrollView, Box, Pressable } from 'native-base';
+import { VStack, Text, Icon, Flex, ScrollView, Box } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Dimensions, ImageBackground } from 'react-native';
+import { Dimensions } from 'react-native';
 import LoadingOverlay from '../../../components/LoadingOverlay/LoadingOverlay';
 import useAuthStore from '../../../store/useAuthStore';
-import { getSubscriptionByUser } from '../../../api/subscriptions';
 import { getTasksByPlan } from '../../../api/plan';
 import { PressableScale } from '../../../components/PressableScale/PressableScale';
 import { getTaskAssigmentsByUser, createTaskAssignment } from '../../../api/tasksAssigments';
@@ -13,7 +12,6 @@ import { getTaskAssigmentsByUser, createTaskAssignment } from '../../../api/task
 const TaskCard = ({ item, index, handleAction, isAssigned, subscriptionData }) => {
     // Componente para manejar el renderizado de cada tarjeta de tarea
     return (
-
         <Box my={2} bg='#293751' key={`task-${index}`} opacity={0.8} flex={1} p={4} rounded="lg">
             <Flex direction="column" justifyContent="space-between">
                 <Flex direction="row" justify="space-between" align="center">
@@ -51,8 +49,7 @@ const TaskCard = ({ item, index, handleAction, isAssigned, subscriptionData }) =
 
 const TasksPlan = () => {
     const navigation = useNavigation();
-    const { user } = useAuthStore();
-    const [subscriptionData, setSubscriptionData] = useState({});
+    const { user, subscriptionData, fetchSubscription } = useAuthStore();
     const [taskAssignments, setTaskAssignments] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -64,11 +61,8 @@ const TasksPlan = () => {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const [subscriptionData, taskAssignments] = await Promise.all([
-                getSubscriptionByUser(user?.sub),
-                getTaskAssigmentsByUser(user?.sub),
-            ]);
-            setSubscriptionData(subscriptionData);
+            const taskAssignments = await getTaskAssigmentsByUser(user?.sub);
+            setTaskAssignments(taskAssignments);
 
             // Filtrar tareas aprobadas para revisión antes de establecer taskAssignments
             const filteredTaskAssignments = taskAssignments.filter(
@@ -76,7 +70,7 @@ const TasksPlan = () => {
             );
             setTaskAssignments(filteredTaskAssignments);
 
-            if (subscriptionData.plan) {
+            if (subscriptionData?.plan) {
                 const tasks = await getTasksByPlan(subscriptionData.plan.plan_id);
 
                 // Filtrar tareas aprobadas para revisión antes de establecer tasks
@@ -90,14 +84,16 @@ const TasksPlan = () => {
         } finally {
             setLoading(false);
         }
-    }, [user?.sub]);
+    }, [user?.sub, subscriptionData]);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData, reload]);
+        if (user && subscriptionData) {
+            fetchData();
+        }
+    }, [user, subscriptionData, fetchData, reload]);
 
     useEffect(() => {
-        setBannerVisible(taskAssignments.length > 0 ? true : false);
+        setBannerVisible(taskAssignments.length > 0);
     }, [taskAssignments]);
 
     const handleEnrollTask = async (taskId) => {
@@ -112,7 +108,7 @@ const TasksPlan = () => {
                 state: 'INPROGRESS',
             };
 
-            await createTaskAssignment(newAssignment);
+            createTaskAssignment(newAssignment);
         } catch (error) {
             console.error('Error creating task assignment:', error);
             setError(error);
@@ -164,8 +160,6 @@ const TasksPlan = () => {
                     </Text>
                 </Flex>
 
-
-
                 <VStack
                     bg="#181f27"
                     shadow={50}
@@ -186,7 +180,7 @@ const TasksPlan = () => {
                 {bannerVisible && (
                     <Box bg="#BB6BD9" p={2} my={4} borderRadius={5}>
                         <Text color="gray.300">
-                            Ya tienes algrunas tareas asignadas y no estarán disponibles
+                            Ya tienes algunas tareas asignadas y no estarán disponibles
                             hasta que las completes en tu sección de tareas.
                         </Text>
                     </Box>
@@ -203,8 +197,6 @@ const TasksPlan = () => {
                             subscriptionData={subscriptionData}
                         />
                     ))}
-
-
                 </ScrollView>
             </>
         </VStack>

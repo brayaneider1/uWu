@@ -1,43 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Keyboard, TouchableOpacity } from 'react-native';
-import { View, Text, Input, Button, Spinner, Alert } from 'native-base';
+import { View, Text, Input, Button, Alert, Icon } from 'native-base';
 import { useForm, Controller } from 'react-hook-form';
+import { MaterialIcons } from '@expo/vector-icons';
 import useAuthStore from '../../../store/useAuthStore'; // Importar el hook de autenticación
 import LoadingOverlay from '../../../components/LoadingOverlay/LoadingOverlay';
-import { getSubscriptionByUser } from '../../../api/subscriptions';
+
 export default function Login({ navigation }) {
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [hidePassword, setHidePassword] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState({ show: false, message: '' });
-  const { login, user, subscritionId } = useAuthStore();
+  const [hidePassword2, setHidePassword2] = useState(true);
+  const { login, loading, error, subscriptionData, isAuthenticated } = useAuthStore();
 
   const onSubmit = async (data) => {
-    Keyboard.dismiss()
-    setIsLoading(true);
-    setError(null);
-
+    Keyboard.dismiss();
     try {
       await login(data.phone, data.password);
-      const subscription = user != null ? await getSubscriptionByUser(user?.sub) : null
-      subscritionId(subscription?.subscription_id)
-      setIsLoading(false);
-      if (subscription?.plan?.plan_id == 1) {
-        navigation.navigate('NotificationPlan');
-      } else {
-        navigation.navigate('Register');
-      }
-
     } catch (err) {
-      setIsLoading(false);
-      setError({
-        show: true,
-        message: 'Credenciales incorrectas. Por favor, inténtalo de nuevo.',
-      });
+      console.log(err);
     }
   };
 
@@ -53,8 +36,13 @@ export default function Login({ navigation }) {
       name: 'password',
       placeholder: 'Contraseña',
       keyboardType: 'default',
-      secureTextEntry: hidePassword,
+      secureTextEntry: hidePassword2,
       rules: { required: true },
+      icon: (
+        <TouchableOpacity onPress={() => setHidePassword2(!hidePassword2)}>
+          <Icon as={MaterialIcons} name={hidePassword2 ? 'visibility-off' : 'visibility'} mx={2} size={5} color="white" />
+        </TouchableOpacity>
+      ),
     },
   ];
 
@@ -66,9 +54,9 @@ export default function Login({ navigation }) {
       justifyContent='space-between'
       color='white'
     >
-      {isLoading && <LoadingOverlay />}
+      {loading && <LoadingOverlay />}
 
-      {error?.show && (
+      {error && (
         <Alert status='error' w='100%'>
           <Text>{error.message}</Text>
         </Alert>
@@ -99,6 +87,8 @@ export default function Login({ navigation }) {
                   placeholder={field.placeholder}
                   keyboardType={field.keyboardType}
                   secureTextEntry={field.secureTextEntry}
+                  InputRightElement={field.icon}
+
                 />
               )}
               name={field.name}

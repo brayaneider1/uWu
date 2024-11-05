@@ -8,28 +8,14 @@ import { getSubscriptionByUser } from '../../../api/subscriptions';
 
 function ProfileSummary() {
     const navigation = useNavigation();
-    const { user } = useAuthStore();
-    const [subscriptionData, setSubscriptionData] = useState({})
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(false)
-
-    const fetchSubscription = async () => {
-        setLoading(true);
-        setError(null); // Resetea el estado de error antes de la llamada
-        try {
-            const data = await getSubscriptionByUser(user?.sub);
-            setSubscriptionData(data);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    const { user, subscriptionData, loading, error, fetchSubscription } = useAuthStore();
+    console.log("🚀 ~ ProfileSummary ~ user:", user)
 
     useEffect(() => {
-        fetchSubscription();
-    }, []);
+        if (user) {
+          fetchSubscription(user.sub);
+        }
+      }, []);
     const data = [{ value: subscriptionData?.user?.name }, { value: subscriptionData?.user?.phone_number }, { value: subscriptionData?.user?.email }, { value: subscriptionData?.user?.referral_code }]
     return (
         <VStack h="100%" bg="white" alignItems="center" p={4} rounded="lg">

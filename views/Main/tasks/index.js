@@ -7,13 +7,15 @@ import useAuthStore from '../../../store/useAuthStore';
 import TabCard from './TabCard'; 
 import renderTabBar from './renderTabBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Tasks = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const { user } = useAuthStore();
+  const { user, subscriptionData, fetchSubscription, isAuthenticated } = useAuthStore();
   const [taskAssignments, setTaskAssignments] = useState([]);
   const [reload, setReload] = useState(true);
+  const navigation = useNavigation();
 
   const updateAsyncStorage = async (approvedTasks) => {
     try {
@@ -28,7 +30,6 @@ const Tasks = () => {
       console.error('Error storing approved tasks:', error);
     }
   };
-  
 
   useEffect(() => {
     const fetchTaskAssignments = async () => {
@@ -51,9 +52,22 @@ const Tasks = () => {
       }
     };
 
-    fetchTaskAssignments();
+    if (user) {
+      fetchSubscription(user.sub); // Asegúrate de que el token esté disponible
+      fetchTaskAssignments();
+    }
   }, [user, reload]);
 
+/*   useEffect(() => {
+    if (isAuthenticated && subscriptionData) {
+      if (subscriptionData?.plan?.plan_id === 1) {
+        navigation.navigate('NotificationPlan');
+      } else {
+        navigation.navigate('Register');
+      }
+    }
+  }, [isAuthenticatedr, subscriptionData, navigation]);
+ */
   const categorizeTasks = () => {
     return {
       inProgress: taskAssignments.filter(task => task.state === 'ACCEPTED'),
@@ -78,11 +92,12 @@ const Tasks = () => {
     rejected: () => <TabCard handleSubmit={handleSubmit} tasks={categorizeTasks().rejected} />,
   });
 
-  const handleSubmit = async (taskId) => {
+  const handleSubmit = async (task) => {
+    console.log("🚀 ~ handleSubmit ~ taskId:", task)
     setLoading(true);
     setError(null);
     try {
-      await updateTaskAssigmentState(taskId, 'COMPLETED');
+      await updateTaskAssigmentState(task.assignment_id, 'COMPLETED');
     } catch (error) {
       console.error('Error updating task assignment:', error);
       setError(error);

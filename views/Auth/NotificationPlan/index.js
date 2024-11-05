@@ -58,7 +58,7 @@ export default function NotificationPlan({ navigation }) {
 
     const handleConfirmar = () => {
         setShowAlert(false);
-        navigation.navigate('Login');
+      //  navigation.navigate('Login');
     };
 
 
@@ -143,7 +143,11 @@ export default function NotificationPlan({ navigation }) {
                         {!isOpen ?
                             <>
                                 <Text color="black" textAlign='center' fontSize={22} fontWeight={500} >Adquiere un plan de beneficios</Text>
-                                <Text color="black" textAlign='center' fontSize={22} fontWeight={200} >Hemos notado que no tienes ningún plan asociado a tu cuenta,aquí te presentamos los planes que tenemos disponibles para tí</Text>
+                                <Text color="black" textAlign='center' fontSize={22} fontWeight={200}>
+  No tienes ningún plan asociado a tu cuenta. Aquí están los planes disponibles para ti.
+</Text>
+
+
                                 <Button onPress={() => setIsOpen(true)} w="100" fontSize={18} color='black' bg="gray.500" margin="auto" borderRadius="3xl" >ver</Button>
                             </> :
                             <>
