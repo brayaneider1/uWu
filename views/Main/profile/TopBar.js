@@ -12,7 +12,6 @@ export const ProfileTobBar = () => {
 
   const handleLogout = () => {
     logout(); // Llama a la función de logout
-    navigation.navigate("Login"); // Navega a la pantalla de Login
   };
 
   return (

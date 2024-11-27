@@ -14,7 +14,6 @@ export const getTaskAssigmentsByUser = async (userId) => {
 
 
 export const getSubscriptorsByCode = async (code) => {
-  console.log("🚀 ~ getSubscriptorsByCode ~ code:", code)
   try {
     const response = await axios.get(`${apiUrl}/subscriptions/referrer/${code}`);
     return response.data;
@@ -27,8 +26,8 @@ export const getSubscriptorsByCode = async (code) => {
 export const createTaskAssignment = async ({ taskId, userId, dueDate, attachment }) => {
   try {
     const response = await axios.post(`${apiUrl}/task-assignments`, {
-      taskId,
-      userId,
+      task:taskId,
+      user:userId,
       dueDate,
       attachment,
     });
@@ -41,7 +40,6 @@ export const createTaskAssignment = async ({ taskId, userId, dueDate, attachment
 
 
 export const updateTaskAssigmentState = async (assignmentId, newState) => {
-  console.log("🚀 ~ updateTaskAssigmentState ~ newState:", newState)
   try {
     const response = await axios.put(`${apiUrl}/task-assignments/${assignmentId}/state`, { newState:newState+"" });
     return response.data;

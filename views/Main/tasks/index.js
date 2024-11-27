@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { VStack } from 'native-base';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import LoadingOverlay from '../../../components/LoadingOverlay/LoadingOverlay';
@@ -16,6 +16,7 @@ const Tasks = () => {
   const [taskAssignments, setTaskAssignments] = useState([]);
   const [reload, setReload] = useState(true);
   const navigation = useNavigation();
+  const [index, setIndex] = useState(0);
 
   const updateAsyncStorage = async (approvedTasks) => {
     try {
@@ -31,43 +32,49 @@ const Tasks = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchTaskAssignments = async () => {
-      setLoading(true);
-      try {
-        const data = await getTaskAssigmentsByUser(user?.sub);
-        setTaskAssignments(data);
+  const fetchTaskAssignments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getTaskAssigmentsByUser(user?.sub);
+      setTaskAssignments(data);
 
-        const approvedTasks = data.filter(task => task.state === 'REVIEW_APPROVED');
-        if (approvedTasks.length > 0) {
-          updateAsyncStorage(approvedTasks);
-        } else {
-          console.log("No approved tasks found.");
-        }
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      } finally {
-        setLoading(false);
-        setReload(false);
+      const approvedTasks = data.filter(task => task.state === 'REVIEW_APPROVED');
+      if (approvedTasks.length > 0) {
+        updateAsyncStorage(approvedTasks);
+      } else {
+        console.log("No approved tasks found.");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+      setReload(false);
+    }
+  }, [user]);
 
+  useEffect(() => {
     if (user) {
       fetchSubscription(user.sub); // Asegúrate de que el token esté disponible
       fetchTaskAssignments();
     }
-  }, [user, reload]);
+  }, [user, fetchSubscription, fetchTaskAssignments]);
 
-/*   useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated && subscriptionData) {
       if (subscriptionData?.plan?.plan_id === 1) {
         navigation.navigate('NotificationPlan');
       } else {
-        navigation.navigate('Register');
+        navigation.navigate('Tareas');
       }
     }
-  }, [isAuthenticatedr, subscriptionData, navigation]);
- */
+  }, [isAuthenticated, subscriptionData, navigation]);
+
+  useEffect(() => {
+    if (user) {
+      fetchTaskAssignments();
+    }
+  }, [index, fetchTaskAssignments]);
+
   const categorizeTasks = () => {
     return {
       inProgress: taskAssignments.filter(task => task.state === 'ACCEPTED'),
@@ -77,7 +84,6 @@ const Tasks = () => {
     };
   };
 
-  const [index, setIndex] = useState(0);
   const routes = [
     { key: 'inProgress', title: 'En Progreso' },
     { key: 'sent', title: 'Enviadas' },
@@ -93,11 +99,11 @@ const Tasks = () => {
   });
 
   const handleSubmit = async (task) => {
-    console.log("🚀 ~ handleSubmit ~ taskId:", task)
     setLoading(true);
     setError(null);
     try {
       await updateTaskAssigmentState(task.assignment_id, 'COMPLETED');
+      fetchTaskAssignments(); // Fetch tasks again to update the state
     } catch (error) {
       console.error('Error updating task assignment:', error);
       setError(error);

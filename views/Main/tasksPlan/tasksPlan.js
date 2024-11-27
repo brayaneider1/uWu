@@ -63,15 +63,17 @@ const TasksPlan = () => {
             setLoading(true);
             const taskAssignments = await getTaskAssigmentsByUser(user?.sub);
             setTaskAssignments(taskAssignments);
+            console.log("🚀 ~ fetchData ~ taskAssignments:", taskAssignments)
 
             // Filtrar tareas aprobadas para revisión antes de establecer taskAssignments
             const filteredTaskAssignments = taskAssignments.filter(
                 assignment => assignment.state !== 'REVIEW_APPROVED'
             );
             setTaskAssignments(filteredTaskAssignments);
-
+        
             if (subscriptionData?.plan) {
                 const tasks = await getTasksByPlan(subscriptionData.plan.plan_id);
+                console.log("🚀 ~ fetchData ~ getTasksByPlan:", getTasksByPlan)
 
                 // Filtrar tareas aprobadas para revisión antes de establecer tasks
                 const filteredTasks = tasks.filter(
@@ -90,6 +92,7 @@ const TasksPlan = () => {
         if (user && subscriptionData) {
             fetchData();
         }
+        console.log("🚀 ~ TasksPlan ~ user:", user)
     }, [user, subscriptionData, fetchData, reload]);
 
     useEffect(() => {

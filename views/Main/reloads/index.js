@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { VStack, Text, Icon, Flex, HStack, ScrollView, Divider, Button, Modal, Box, FormControl, Image } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker'; 
+import * as ImagePicker from 'expo-image-picker';
+import { updatePaymentProof } from '../../../api/subscriptions'; // Asegúrate de importar la función correctamente
+import useAuthStore from '../../../store/useAuthStore'; // Importar el hook de autenticación
 
 function Reload() {
     const navigation = useNavigation();
+    const { user } = useAuthStore(); // Obtener el usuario autenticado
     const [showModal, setShowModal] = useState(false);
     const [image, setImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const data = [
         { value: '450000', date: '2020-03-02 10:49 AM' },
@@ -27,9 +31,31 @@ function Reload() {
         }
     };
 
-    const handleSubmit = () => {
-        setShowModal(false);
-        // Lógica para enviar la imagen al servicio backend
+    const handleSubmit = async () => {
+        if (!image || !user) return;
+
+        setLoading(true);
+        try {
+            const base64Image = await convertImageToBase64(image);
+            await updatePaymentProof(user.sub, base64Image);
+            setShowModal(false);
+            setImage(null);
+        } catch (error) {
+            console.error('Error uploading payment proof:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const convertImageToBase64 = async (uri) => {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
     };
 
     return (
@@ -105,7 +131,7 @@ function Reload() {
                                     </Flex>
                                 </Button>
                             ) : (
-                                <Button mt={2} bg="green.500" borderRadius="full" shadow={2} onPress={handleSubmit}>
+                                <Button mt={2} bg="green.500" borderRadius="full" shadow={2} onPress={handleSubmit} isLoading={loading}>
                                     <Flex flexDirection="row" align="center">
                                         <Icon as={MaterialIcons} name="send" size={6} color="white" mr={2} />
                                         <Text color="white" fontWeight={600}>Enviar comprobante</Text>

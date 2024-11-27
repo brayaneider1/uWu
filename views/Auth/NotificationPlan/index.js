@@ -54,6 +54,8 @@ export default function NotificationPlan({ navigation }) {
 
     const handleRecargar = () => {
         setShowAlert(false);
+        navigation.navigate('Reload');
+
     };
 
     const handleConfirmar = () => {
